@@ -8,8 +8,8 @@ type FormValues = {
 
 const FormFix = () => {
     const form = useForm<FormValues>();
-    const {register, control, handleSubmit} = form;
-
+    const {register, control, handleSubmit, formState} = form;
+    const {errors} = formState; 
 
     const onSubmit = (data: FormValues)=>{
         console.log('Form Values', data);
@@ -17,12 +17,28 @@ const FormFix = () => {
 
   return (
     <div>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <label htmlFor="email">Email</label>
-            <input type="email" id='email' {...register("email")}/>
+            <input type="email" id='email' {...register("email",{
+                pattern:{
+                    value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                    message:"Invalid Email Format"
+                },
+                validate: (fieldValue)=>{
+                    return (
+                        !fieldValue.includes("gmail") || 
+                        "Register With Business Email"
+                    )
+                }
+            })}/>
+            <p className='error'>{errors.email?.message}</p>
 
             <label htmlFor="password">Password</label>
-            <input type="password" id='password' {...register("password")} />
+            <input type="password" id='password' {...register("password",{
+                required: "Password Field Required"
+            })} />
+            <p className='error'>{errors.password?.message}</p>
+
 
             <button>Submit</button>
         </form>
